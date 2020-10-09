@@ -1,5 +1,4 @@
 import React from 'react';
-import fakeData from '../../fakeData';
 import { useState } from 'react';
 import './Shop.css';
 import Product from '../product/Product';
@@ -8,22 +7,37 @@ import {addToDatabaseCart, getDatabaseCart} from '../../utilities/databaseManage
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
+
+
 const Shop = () => {
-    const first10 = fakeData.slice(0, 10);
-   const [products, setProducts] = useState(first10);
+    // const first10 = fakeData.slice(0, 10); 
+   const [products, setProducts] = useState([]);
+   const [search, setSearch] = useState('');
+
+   useEffect(() => {
+       fetch('https://shrouded-beach-53601.herokuapp.com/products?search='+search)
+       .then(res => res.json())
+       .then(data =>setProducts(data))
+   },[search]);
 
    const [cart, setCart] = useState([]);
 
    useEffect(() => {
         const savedCart = getDatabaseCart();
-        const productKey = Object.keys(savedCart);
-        const previousCart = productKey.map(existingKey => {
-            const product = fakeData.find(pd => pd.key === existingKey);
-        product.quantity = savedCart[existingKey];
-        return(product);
-        })
-        setCart(previousCart);
+        const productKeys = Object.keys(savedCart);
+        fetch('https://shrouded-beach-53601.herokuapp.com/productsByKeys', {
+           method: 'POST',
+           headers: {'Content-Type': 'application/json'},
+           body:JSON.stringify(productKeys)
+       })
+
+       .then(res => res.json())
+       .then(data => setCart(data))
    }, [])
+
+   const handleSearch = event => {
+        setSearch(event.target.value);
+   }
    
    const handleClick = (product) =>{
       const toBeAddedKey = product.key
@@ -47,9 +61,14 @@ const Shop = () => {
     return (
         <div className='twin-container'>
            <div className="product-container">
+               <input type="text" onBlur={handleSearch} placeholder="search product"/>
+                {
+                    products.length === 0 && <p>Loading...</p>
+                }
+
                {
                     products.map(prdct => <Product
-                        key={prdct.key}
+                        // key={prdct.key}
                         showAddToCart={true}
                         handleClick ={handleClick}
                          product={prdct}>

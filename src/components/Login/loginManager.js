@@ -21,6 +21,7 @@ export  const handleGoogleSingIn = ()=>{
           photo: photoURL,
           success: true
         }
+        setUserToken();
         return (singInUser);
   })
   .catch(err => {
@@ -29,6 +30,13 @@ export  const handleGoogleSingIn = ()=>{
   })
   }
 
+  const setUserToken = () => {
+    firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function(idToken) {
+      sessionStorage.setItem('token', idToken);
+    }).catch(function(error) {
+      // Handle error
+    });
+  }
 
   export const handleFbSingIn= () => {
     const fbProvider = new firebase.auth.FacebookAuthProvider();

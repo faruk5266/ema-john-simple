@@ -9,15 +9,15 @@ const Cart = (props) => {
     let total = 0;
     for (let i = 0; i < cart.length; i++) {
         const product =cart[i]; 
-         total = total + product.price * product.quantity; 
+         total = total + product.price * product.quantity || 1 ; 
         
     }
 
     let shipping = 0;
-    if (total > 200) {
+    if (total > 50) {
         shipping = 2.99;
     }
-    else if(total > 500){
+    else if(total > 30){
         shipping = 4.99;
     }
 const tax = (total / 5).toFixed(2) ;
